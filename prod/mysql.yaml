@@ -11,6 +11,7 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: "/mnt/data"
+
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -23,6 +24,7 @@ spec:
   resources:
     requests:
       storage: 20Gi
+
 ---
 apiVersion: v1
 kind: Service
@@ -35,6 +37,7 @@ spec:
   selector:
     app: mysql
   clusterIP: None
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -56,20 +59,17 @@ spec:
       - image: mysql:5.6
         name: mysql
         env:
-          # Use secret in real usage
         - name: MYSQL_ROOT_PASSWORD
-          value: password
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: root-password
         ports:
         - containerPort: 3306
           name: mysql
         volumeMounts:
         - name: mysql-persistent-storage
           mountPath: /var/lib/mysql
-      - image: adminer
-        name: adminer
-        ports:
-        - containerPort: 8080
-
       volumes:
       - name: mysql-persistent-storage
         persistentVolumeClaim:

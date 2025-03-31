@@ -5,7 +5,34 @@
     pip:
       name: kubernetes
       state: present
-  - name: install mysql
+
+  - name: Create MySQL Secret
+    kubernetes.core.k8s:
+      state: present
+      definition:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: mysql-secret
+          namespace: default
+        type: Opaque
+        data:
+          root-password: "{{ 'YourSecurePassword' | b64encode }}"
+
+  - name: Deploy MySQL
     kubernetes.core.k8s:
       state: present
       src: mysql.yaml
+
+  - name: Add gitea chart repo
+    kubernetes.core.helm_repository:
+      name: gitea-charts
+      repo_url: "https://dl.gitea.com/charts/"
+
+  - name: Deploy latest version of gitea
+    kubernetes.core.helm:
+      name: gitea
+      chart_ref: gitea-charts/gitea
+      release_namespace: default
+      values_files:
+        - values.yaml

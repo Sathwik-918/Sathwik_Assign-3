@@ -1,0 +1,22 @@
+gitea:
+  database:
+    type: mysql
+    host: mysql.default.svc.cluster.local:3306
+    username: gitea
+    password: sathwik123
+    databaseName: gitea
+
+  persistence:
+    enabled: true
+    size: 10Gi
+
+  service:
+    type: LoadBalancer
+
+  ingress:
+    enabled: true
+    hosts:
+      - host: gitea.your-domain.com
+        paths:
+          - path: /
+            pathType: Prefix

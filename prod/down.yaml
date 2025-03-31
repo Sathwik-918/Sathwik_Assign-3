@@ -1,11 +1,23 @@
 ---
 - hosts: localhost
   tasks:
-  - name: remove mysql
+  - name: Remove Gitea
+    kubernetes.core.helm:
+      name: gitea
+      state: absent
+      release_namespace: default
+
+  - name: Remove MySQL
     kubernetes.core.k8s:
       state: absent
       src: mysql.yaml
-  - name: "remove kubernetes python package"
-    pip:
-      name: kubernetes
+
+  - name: Remove MySQL Secret
+    kubernetes.core.k8s:
       state: absent
+      definition:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: mysql-secret
+          namespace: default
